@@ -51,16 +51,23 @@ class _PageTwoState extends State<PageTwo> {
                     ),
                   )
                 : CustomButton(onPressed: () => callAPI(), title: 'Get Data'),
-            ValueListenableBuilder<List<Post>>(
-              valueListenable: posts,
-              builder: (_, value, __) => ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: value.length,
-                itemBuilder: (_, i) => ListTile(
-                  title: Text(value[i].title),
-                ),
+            AnimatedBuilder(
+              animation: Listenable.merge(
+                [posts, isLoading],
               ),
+              builder: (_, __) => isLoading.value
+                  ? Container(
+                      padding: const EdgeInsets.all(10),
+                      child: const CircularProgressIndicator(),
+                    )
+                  : ListView.builder(
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: posts.value.length,
+                      itemBuilder: (_, i) => ListTile(
+                        title: Text(posts.value[i].title),
+                      ),
+                    ),
             ),
             Center(
               child: CustomButton(
