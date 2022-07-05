@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_2/controllers/posts_controller.dart';
 import 'package:flutter_2/widgets/custom_button_widget.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:flutter_2/classes/Post.dart';
 
 class PageTwo extends StatefulWidget {
   const PageTwo({Key? key}) : super(key: key);
@@ -12,22 +10,7 @@ class PageTwo extends StatefulWidget {
 }
 
 class _PageTwoState extends State<PageTwo> {
-  ValueNotifier<List<Post>> posts = ValueNotifier<List<Post>>([]);
-  ValueNotifier<bool> isLoading = ValueNotifier<bool>(false);
-
-  callAPI() async {
-    var client = http.Client();
-    try {
-      isLoading.value = true;
-      var response = await client
-          .get(Uri.parse('https://jsonplaceholder.typicode.com/posts'));
-      var decodedResponse = jsonDecode(response.body) as Iterable;
-      posts.value = decodedResponse.map((e) => Post.fromJson(e)).toList();
-    } finally {
-      client.close();
-      isLoading.value = false;
-    }
-  }
+  final PostsController _controller = PostsController();
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +22,7 @@ class _PageTwoState extends State<PageTwo> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            posts.value.isNotEmpty
+            _controller.posts.value.isNotEmpty
                 ? Container(
                     padding: const EdgeInsets.only(top: 15),
                     child: const Text(
@@ -50,12 +33,13 @@ class _PageTwoState extends State<PageTwo> {
                           color: Colors.pink),
                     ),
                   )
-                : CustomButton(onPressed: () => callAPI(), title: 'Get Data'),
+                : CustomButton(
+                    onPressed: () => _controller.callAPI(), title: 'Get Data'),
             AnimatedBuilder(
               animation: Listenable.merge(
-                [posts, isLoading],
+                [_controller.posts, _controller.isLoading],
               ),
-              builder: (_, __) => isLoading.value
+              builder: (_, __) => _controller.isLoading.value
                   ? Container(
                       padding: const EdgeInsets.all(10),
                       child: const CircularProgressIndicator(),
@@ -63,9 +47,9 @@ class _PageTwoState extends State<PageTwo> {
                   : ListView.builder(
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
-                      itemCount: posts.value.length,
+                      itemCount: _controller.posts.value.length,
                       itemBuilder: (_, i) => ListTile(
-                        title: Text(posts.value[i].title),
+                        title: Text(_controller.posts.value[i].title),
                       ),
                     ),
             ),
