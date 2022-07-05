@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:flutter_2/models/Post_Model.dart';
+import 'package:flutter_2/models/post_model.dart';
 
 class PostsController {
   ValueNotifier<List<Post>> posts = ValueNotifier<List<Post>>([]);
